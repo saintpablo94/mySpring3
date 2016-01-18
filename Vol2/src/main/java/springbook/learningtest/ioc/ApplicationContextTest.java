@@ -7,6 +7,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.support.StaticApplicationContext;
 
@@ -35,8 +37,20 @@ public class ApplicationContextTest {
 	}
 	
 	@Test
-	public void registerBeanWithDependency(){
+	public void registerBeanWithDependency2(){
 		StaticApplicationContext appContext = new StaticApplicationContext();
+		
 		appContext.registerBeanDefinition("printer", new RootBeanDefinition(StringPrinter.class));
+		
+		BeanDefinition helloDef = new RootBeanDefinition(Hello.class);
+		helloDef.getPropertyValues().addPropertyValue("name", "Spring");
+		helloDef.getPropertyValues().addPropertyValue("printer", new RuntimeBeanReference("printer"));
+		
+		appContext.registerBeanDefinition("hello", helloDef);
+		
+		Hello hello = (Hello)appContext.getBean("hello", Hello.class);
+		hello.print();
+		
+		assertThat(appContext.getBean("printer").toString(), is("Hello Spring"));
 	}
 }
