@@ -11,6 +11,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.support.StaticApplicationContext;
 
 import springbook.learningtest.ioc.bean.Hello;
+import springbook.learningtest.ioc.bean.StringPrinter;
 
 
 public class ApplicationContextTest {
@@ -31,5 +32,11 @@ public class ApplicationContextTest {
 		assertThat(hello2.sayHello(), is("Hello Spring"));
 		assertThat(hello1, is(not(hello2)));
 		assertThat(appContext.getBeanFactory().getBeanDefinitionCount(), is(2));
+	}
+	
+	@Test
+	public void registerBeanWithDependency(){
+		StaticApplicationContext appContext = new StaticApplicationContext();
+		appContext.registerBeanDefinition("printer", new RootBeanDefinition(StringPrinter.class));
 	}
 }
