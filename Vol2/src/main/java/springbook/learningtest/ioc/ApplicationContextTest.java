@@ -10,6 +10,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
 import springbook.learningtest.ioc.bean.Hello;
@@ -51,6 +54,20 @@ public class ApplicationContextTest {
 		Hello hello = (Hello)appContext.getBean("hello", Hello.class);
 		hello.print();
 		
+		assertThat(appContext.getBean("printer").toString(), is("Hello Spring"));
+	}
+	
+	@Test
+	public void genericApplicationContext(){
+//		GenericApplicationContext appContext = new GenericApplicationContext();
+//		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
+//		reader.loadBeanDefinitions("springbook/learningtest/ioc/genericApplicationContext.xml");
+//		appContext.refresh();
+		
+		GenericApplicationContext appContext = 
+				new GenericXmlApplicationContext("springbook/learningtest/ioc/genericApplicationContext.xml");
+		
+		Hello hello = appContext.getBean("Hello", Hello.class);
 		assertThat(appContext.getBean("printer").toString(), is("Hello Spring"));
 	}
 }
