@@ -3,6 +3,7 @@ package springbook.learningtest.ioc;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import org.junit.Test;
@@ -11,15 +12,24 @@ import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
+import springbook.learningtest.ioc.bean.AnnotatedHello;
+import springbook.learningtest.ioc.bean.AnnotatedHelloConfig;
 import springbook.learningtest.ioc.bean.Hello;
+import springbook.learningtest.ioc.bean.Printer;
 import springbook.learningtest.ioc.bean.StringPrinter;
 
 
 public class ApplicationContextTest {
+	
+	private String basePath = StringUtils.cleanPath(ClassUtils.classPackageAsResourcePath(getClass()))+"/" ;
 	
 	@Test
 	public void registerBean(){
@@ -59,15 +69,67 @@ public class ApplicationContextTest {
 	
 	@Test
 	public void genericApplicationContext(){
-//		GenericApplicationContext appContext = new GenericApplicationContext();
-//		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
-//		reader.loadBeanDefinitions("springbook/learningtest/ioc/genericApplicationContext.xml");
-//		appContext.refresh();
+		GenericApplicationContext appContext = new GenericApplicationContext();
+		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
+		reader.loadBeanDefinitions(basePath+"genericApplicationContext.xml");
+		appContext.refresh();
 		
-		GenericApplicationContext appContext = 
-				new GenericXmlApplicationContext("springbook/learningtest/ioc/genericApplicationContext.xml");
-		
-		Hello hello = appContext.getBean("Hello", Hello.class);
+		Hello hello = appContext.getBean("hello", Hello.class);
+		hello.print();
 		assertThat(appContext.getBean("printer").toString(), is("Hello Spring"));
+	}
+	
+	@Test
+	public void genericXmlApplicationContext(){
+		GenericApplicationContext appContext = 
+				new GenericXmlApplicationContext(basePath+"genericApplicationContext.xml");
+		
+		Hello hello = appContext.getBean("hello", Hello.class);
+		hello.print();
+		assertThat(appContext.getBean("printer").toString(), is("Hello Spring"));
+	}
+	
+	@Test
+	public void parentChildeApplicationContext(){
+		ApplicationContext parent = new GenericXmlApplicationContext(basePath+"parentContext.xml");
+		GenericApplicationContext child = new GenericApplicationContext(parent);
+		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(child);
+		reader.loadBeanDefinitions(basePath+"childContext.xml");
+		child.refresh();
+		
+		Printer printer = child.getBean("printer", Printer.class);
+		assertThat(printer, is(notNullValue()));
+		
+		Hello hello = child.getBean("hello", Hello.class);
+		assertThat(hello, is(notNullValue()));
+		
+		hello.print();
+		assertThat(printer.toString(), is("Hello Child"));
+		
+//		Hello helloParent = parent.getBean("hello", Hello.class);
+//		helloParent.print();
+//		assertThat(printer.toString(), is("Hello Parent"));
+	}
+	
+	@Test
+	public void simpleBeanScanning(){
+		ApplicationContext ctx =
+				new AnnotationConfigApplicationContext(""
+						+ "springbook.learningtest.ioc.bean");
+		AnnotatedHello hello = ctx.getBean("annotatedHello", AnnotatedHello.class);
+		assertThat(hello, is(notNullValue()));
+	}
+	
+	@Test
+	public void simpleBeanAnnotation(){
+		ApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AnnotatedHelloConfig.class);
+		AnnotatedHello hello = ctx.getBean("annotatedHello", AnnotatedHello.class);
+		assertThat(hello, is(notNullValue()));
+		
+		AnnotatedHelloConfig config = ctx.getBean("annotatedHelloConfig", AnnotatedHelloConfig.class);
+		assertThat(config, is(notNullValue()));
+		
+		assertThat(config.annotatedHello(), is(sameInstance(hello)));
 	}
 }
