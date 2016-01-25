@@ -1,7 +1,10 @@
-package springbook.learningtest.ioc.bean;
+package springbook.learningtest.ioc.autowired;
 
+import org.springframework.stereotype.Component;
+
+@Component("myprinter")
 public class StringPrinter implements Printer {
-
+	
 	private StringBuffer buffer = new StringBuffer();
 	
 	@Override
@@ -12,4 +15,5 @@ public class StringPrinter implements Printer {
 	public String toString(){
 		return this.buffer.toString();
 	}
+
 }

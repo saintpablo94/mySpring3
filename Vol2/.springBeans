@@ -10,6 +10,7 @@
 		<config>src/main/java/springbook/learningtest/ioc/genericApplicationContext.xml</config>
 		<config>src/main/java/springbook/learningtest/ioc/parentContext.xml</config>
 		<config>src/main/java/springbook/learningtest/ioc/childContext.xml</config>
+		<config>src/main/java/springbook/learningtest/ioc/resource.xml</config>
 	</configs>
 	<autoconfigs>
 	</autoconfigs>

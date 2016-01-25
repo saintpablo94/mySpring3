@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import springbook.learningtest.ioc.bean.AnnotatedHello;
 import springbook.learningtest.ioc.bean.AnnotatedHelloConfig;
 import springbook.learningtest.ioc.bean.Hello;
+import springbook.learningtest.ioc.bean.HelloConfig;
 import springbook.learningtest.ioc.bean.Printer;
 import springbook.learningtest.ioc.bean.StringPrinter;
 
@@ -131,5 +132,22 @@ public class ApplicationContextTest {
 		assertThat(config, is(notNullValue()));
 		
 		assertThat(config.annotatedHello(), is(sameInstance(hello)));
+	}
+	
+	@Test
+	public void simpeBeanHelloAnnotation(){
+		ApplicationContext ctx =
+				new AnnotationConfigApplicationContext(HelloConfig.class);
+		Hello hello = ctx.getBean("hello", Hello.class);
+		hello.print();
+
+		assertThat(ctx.getBean("printer").toString(), is("Hello Spring"));
+		
+		Hello hello2 = ctx.getBean("hello2", Hello.class);
+		hello2.print();
+//		assertThat(ctx.getBean("printer").toString(), is("Hello Spring"));
+
+		
+		
 	}
 }
